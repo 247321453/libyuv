@@ -40,7 +40,7 @@ uint32_t HashDjb2(const uint8_t* src, uint64_t count, uint32_t seed) {
   }
 #endif
 #if defined(HAS_HASHDJB2_AVX2)
-  if (TestCpuFlag(kCpuHasAVX2)) {
+  if (Cpu_Has_AVX2) {
     HashDjb2_SSE = HashDjb2_AVX2;
   }
 #endif
@@ -130,32 +130,32 @@ uint64_t ComputeHammingDistance(const uint8_t* src_a,
   uint32_t (*HammingDistance)(const uint8_t* src_a, const uint8_t* src_b,
                               int count) = HammingDistance_C;
 #if defined(HAS_HAMMINGDISTANCE_NEON)
-  if (TestCpuFlag(kCpuHasNEON)) {
+  if (Cpu_Has_NEON) {
     HammingDistance = HammingDistance_NEON;
   }
 #endif
 #if defined(HAS_HAMMINGDISTANCE_SSSE3)
-  if (TestCpuFlag(kCpuHasSSSE3)) {
+  if (Cpu_Has_SSSE3) {
     HammingDistance = HammingDistance_SSSE3;
   }
 #endif
 #if defined(HAS_HAMMINGDISTANCE_SSE42)
-  if (TestCpuFlag(kCpuHasSSE42)) {
+  if (Cpu_Has_SSE42) {
     HammingDistance = HammingDistance_SSE42;
   }
 #endif
 #if defined(HAS_HAMMINGDISTANCE_AVX2)
-  if (TestCpuFlag(kCpuHasAVX2)) {
+  if (Cpu_Has_AVX2) {
     HammingDistance = HammingDistance_AVX2;
   }
 #endif
 #if defined(HAS_HAMMINGDISTANCE_MSA)
-  if (TestCpuFlag(kCpuHasMSA)) {
+  if (Cpu_Has_MSA) {
     HammingDistance = HammingDistance_MSA;
   }
 #endif
 #if defined(HAS_HAMMINGDISTANCE_MMI)
-  if (TestCpuFlag(kCpuHasMMI)) {
+  if (Cpu_Has_MMI) {
     HammingDistance = HammingDistance_MMI;
   }
 #endif
@@ -195,29 +195,29 @@ uint64_t ComputeSumSquareError(const uint8_t* src_a,
   uint32_t (*SumSquareError)(const uint8_t* src_a, const uint8_t* src_b,
                              int count) = SumSquareError_C;
 #if defined(HAS_SUMSQUAREERROR_NEON)
-  if (TestCpuFlag(kCpuHasNEON)) {
+  if (Cpu_Has_NEON) {
     SumSquareError = SumSquareError_NEON;
   }
 #endif
 #if defined(HAS_SUMSQUAREERROR_SSE2)
-  if (TestCpuFlag(kCpuHasSSE2)) {
+  if (Cpu_Has_SSSE2) {
     // Note only used for multiples of 16 so count is not checked.
     SumSquareError = SumSquareError_SSE2;
   }
 #endif
 #if defined(HAS_SUMSQUAREERROR_AVX2)
-  if (TestCpuFlag(kCpuHasAVX2)) {
+  if (Cpu_Has_AVX2) {
     // Note only used for multiples of 32 so count is not checked.
     SumSquareError = SumSquareError_AVX2;
   }
 #endif
 #if defined(HAS_SUMSQUAREERROR_MSA)
-  if (TestCpuFlag(kCpuHasMSA)) {
+  if (Cpu_Has_MSA) {
     SumSquareError = SumSquareError_MSA;
   }
 #endif
 #if defined(HAS_SUMSQUAREERROR_MMI)
-  if (TestCpuFlag(kCpuHasMMI)) {
+  if (Cpu_Has_MMI) {
     SumSquareError = SumSquareError_MMI;
   }
 #endif

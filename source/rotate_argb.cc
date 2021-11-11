@@ -33,7 +33,7 @@ static void ARGBTranspose(const uint8_t* src_argb,
       const uint8_t* src_argb, ptrdiff_t src_stride_argb, int src_step,
       uint8_t* dst_argb, int dst_width) = ScaleARGBRowDownEven_C;
 #if defined(HAS_SCALEARGBROWDOWNEVEN_SSE2)
-  if (TestCpuFlag(kCpuHasSSE2)) {
+  if (Cpu_Has_SSSE2) {
     ScaleARGBRowDownEven = ScaleARGBRowDownEven_Any_SSE2;
     if (IS_ALIGNED(height, 4)) {  // Width of dest.
       ScaleARGBRowDownEven = ScaleARGBRowDownEven_SSE2;
@@ -41,7 +41,7 @@ static void ARGBTranspose(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWNEVEN_NEON)
-  if (TestCpuFlag(kCpuHasNEON)) {
+  if (Cpu_Has_NEON) {
     ScaleARGBRowDownEven = ScaleARGBRowDownEven_Any_NEON;
     if (IS_ALIGNED(height, 4)) {  // Width of dest.
       ScaleARGBRowDownEven = ScaleARGBRowDownEven_NEON;
@@ -49,7 +49,7 @@ static void ARGBTranspose(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWNEVEN_MSA)
-  if (TestCpuFlag(kCpuHasMSA)) {
+  if (Cpu_Has_MSA) {
     ScaleARGBRowDownEven = ScaleARGBRowDownEven_Any_MSA;
     if (IS_ALIGNED(height, 4)) {  // Width of dest.
       ScaleARGBRowDownEven = ScaleARGBRowDownEven_MSA;
@@ -57,7 +57,7 @@ static void ARGBTranspose(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWNEVEN_MMI)
-  if (TestCpuFlag(kCpuHasMMI)) {
+  if (Cpu_Has_MMI) {
     ScaleARGBRowDownEven = ScaleARGBRowDownEven_Any_MMI;
     if (IS_ALIGNED(height, 4)) {  // Width of dest.
       ScaleARGBRowDownEven = ScaleARGBRowDownEven_MMI;
@@ -119,7 +119,7 @@ void ARGBRotate180(const uint8_t* src_argb,
   void (*CopyRow)(const uint8_t* src_argb, uint8_t* dst_argb, int width) =
       CopyRow_C;
 #if defined(HAS_ARGBMIRRORROW_NEON)
-  if (TestCpuFlag(kCpuHasNEON)) {
+  if (Cpu_Has_NEON) {
     ARGBMirrorRow = ARGBMirrorRow_Any_NEON;
     if (IS_ALIGNED(width, 4)) {
       ARGBMirrorRow = ARGBMirrorRow_NEON;
@@ -127,7 +127,7 @@ void ARGBRotate180(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBMIRRORROW_SSE2)
-  if (TestCpuFlag(kCpuHasSSE2)) {
+  if (Cpu_Has_SSSE2) {
     ARGBMirrorRow = ARGBMirrorRow_Any_SSE2;
     if (IS_ALIGNED(width, 4)) {
       ARGBMirrorRow = ARGBMirrorRow_SSE2;
@@ -135,7 +135,7 @@ void ARGBRotate180(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBMIRRORROW_AVX2)
-  if (TestCpuFlag(kCpuHasAVX2)) {
+  if (Cpu_Has_AVX2) {
     ARGBMirrorRow = ARGBMirrorRow_Any_AVX2;
     if (IS_ALIGNED(width, 8)) {
       ARGBMirrorRow = ARGBMirrorRow_AVX2;
@@ -143,7 +143,7 @@ void ARGBRotate180(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBMIRRORROW_MSA)
-  if (TestCpuFlag(kCpuHasMSA)) {
+  if (Cpu_Has_MSA) {
     ARGBMirrorRow = ARGBMirrorRow_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       ARGBMirrorRow = ARGBMirrorRow_MSA;
@@ -151,7 +151,7 @@ void ARGBRotate180(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBMIRRORROW_MMI)
-  if (TestCpuFlag(kCpuHasMMI)) {
+  if (Cpu_Has_MMI) {
     ARGBMirrorRow = ARGBMirrorRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBMirrorRow = ARGBMirrorRow_MMI;
@@ -159,22 +159,22 @@ void ARGBRotate180(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_COPYROW_SSE2)
-  if (TestCpuFlag(kCpuHasSSE2)) {
+  if (Cpu_Has_SSSE2) {
     CopyRow = IS_ALIGNED(width * 4, 32) ? CopyRow_SSE2 : CopyRow_Any_SSE2;
   }
 #endif
 #if defined(HAS_COPYROW_AVX)
-  if (TestCpuFlag(kCpuHasAVX)) {
+  if (Cpu_Has_AVX) {
     CopyRow = IS_ALIGNED(width * 4, 64) ? CopyRow_AVX : CopyRow_Any_AVX;
   }
 #endif
 #if defined(HAS_COPYROW_ERMS)
-  if (TestCpuFlag(kCpuHasERMS)) {
+  if (Cpu_Has_ERMS) {
     CopyRow = CopyRow_ERMS;
   }
 #endif
 #if defined(HAS_COPYROW_NEON)
-  if (TestCpuFlag(kCpuHasNEON)) {
+  if (Cpu_Has_NEON) {
     CopyRow = IS_ALIGNED(width * 4, 32) ? CopyRow_NEON : CopyRow_Any_NEON;
   }
 #endif

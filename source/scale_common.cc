@@ -1044,7 +1044,7 @@ void ScalePlaneVertical(int src_height,
   assert(dst_height > 0);
   src_argb += (x >> 16) * bpp;
 #if defined(HAS_INTERPOLATEROW_SSSE3)
-  if (TestCpuFlag(kCpuHasSSSE3)) {
+  if (Cpu_Has_SSSE3) {
     InterpolateRow = InterpolateRow_Any_SSSE3;
     if (IS_ALIGNED(dst_width_bytes, 16)) {
       InterpolateRow = InterpolateRow_SSSE3;
@@ -1052,7 +1052,7 @@ void ScalePlaneVertical(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_AVX2)
-  if (TestCpuFlag(kCpuHasAVX2)) {
+  if (Cpu_Has_AVX2) {
     InterpolateRow = InterpolateRow_Any_AVX2;
     if (IS_ALIGNED(dst_width_bytes, 32)) {
       InterpolateRow = InterpolateRow_AVX2;
@@ -1060,7 +1060,7 @@ void ScalePlaneVertical(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_NEON)
-  if (TestCpuFlag(kCpuHasNEON)) {
+  if (Cpu_Has_NEON) {
     InterpolateRow = InterpolateRow_Any_NEON;
     if (IS_ALIGNED(dst_width_bytes, 16)) {
       InterpolateRow = InterpolateRow_NEON;
@@ -1068,7 +1068,7 @@ void ScalePlaneVertical(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MSA)
-  if (TestCpuFlag(kCpuHasMSA)) {
+  if (Cpu_Has_MSA) {
     InterpolateRow = InterpolateRow_Any_MSA;
     if (IS_ALIGNED(dst_width_bytes, 32)) {
       InterpolateRow = InterpolateRow_MSA;
@@ -1076,7 +1076,7 @@ void ScalePlaneVertical(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MMI)
-  if (TestCpuFlag(kCpuHasMMI)) {
+  if (Cpu_Has_MMI) {
     InterpolateRow = InterpolateRow_Any_MMI;
     if (IS_ALIGNED(dst_width_bytes, 8)) {
       InterpolateRow = InterpolateRow_MMI;
@@ -1122,7 +1122,7 @@ void ScalePlaneVertical_16(int src_height,
   assert(dst_height > 0);
   src_argb += (x >> 16) * wpp;
 #if defined(HAS_INTERPOLATEROW_16_SSE2)
-  if (TestCpuFlag(kCpuHasSSE2)) {
+  if (Cpu_Has_SSSE2) {
     InterpolateRow = InterpolateRow_Any_16_SSE2;
     if (IS_ALIGNED(dst_width_bytes, 16)) {
       InterpolateRow = InterpolateRow_16_SSE2;
@@ -1130,7 +1130,7 @@ void ScalePlaneVertical_16(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_16_SSSE3)
-  if (TestCpuFlag(kCpuHasSSSE3)) {
+  if (Cpu_Has_SSSE3) {
     InterpolateRow = InterpolateRow_Any_16_SSSE3;
     if (IS_ALIGNED(dst_width_bytes, 16)) {
       InterpolateRow = InterpolateRow_16_SSSE3;
@@ -1138,7 +1138,7 @@ void ScalePlaneVertical_16(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_16_AVX2)
-  if (TestCpuFlag(kCpuHasAVX2)) {
+  if (Cpu_Has_AVX2) {
     InterpolateRow = InterpolateRow_Any_16_AVX2;
     if (IS_ALIGNED(dst_width_bytes, 32)) {
       InterpolateRow = InterpolateRow_16_AVX2;
@@ -1146,7 +1146,7 @@ void ScalePlaneVertical_16(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_16_NEON)
-  if (TestCpuFlag(kCpuHasNEON)) {
+  if (Cpu_Has_NEON) {
     InterpolateRow = InterpolateRow_Any_16_NEON;
     if (IS_ALIGNED(dst_width_bytes, 16)) {
       InterpolateRow = InterpolateRow_16_NEON;

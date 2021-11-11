@@ -63,24 +63,24 @@ int main(int argc, const char* argv[]) {
   printf("Has MIPS %x\n", has_mips);
   printf("Has X86 %x\n", has_x86);
   if (has_arm) {
-    int has_neon = TestCpuFlag(kCpuHasNEON);
+    int has_neon = Cpu_Has_NEON;
     printf("Has NEON %x\n", has_neon);
   }
   if (has_mips) {
-    int has_msa = TestCpuFlag(kCpuHasMSA);
+    int has_msa = Cpu_Has_MSA;
     printf("Has MSA %x\n", has_msa);
-    int has_mmi = TestCpuFlag(kCpuHasMMI);
+    int has_mmi = Cpu_Has_MMI;
     printf("Has MMI %x\n", has_mmi);
   }
   if (has_x86) {
-    int has_sse2 = TestCpuFlag(kCpuHasSSE2);
-    int has_ssse3 = TestCpuFlag(kCpuHasSSSE3);
+    int has_sse2 = Cpu_Has_SSSE2;
+    int has_ssse3 = Cpu_Has_SSSE3;
     int has_sse41 = TestCpuFlag(kCpuHasSSE41);
-    int has_sse42 = TestCpuFlag(kCpuHasSSE42);
-    int has_avx = TestCpuFlag(kCpuHasAVX);
-    int has_avx2 = TestCpuFlag(kCpuHasAVX2);
-    int has_erms = TestCpuFlag(kCpuHasERMS);
-    int has_fma3 = TestCpuFlag(kCpuHasFMA3);
+    int has_sse42 = Cpu_Has_SSE42;
+    int has_avx = Cpu_Has_AVX;
+    int has_avx2 = Cpu_Has_AVX2;
+    int has_erms = Cpu_Has_ERMS;
+    int has_fma3 = Cpu_Has_FMA3;
     int has_f16c = TestCpuFlag(kCpuHasF16C); 
     int has_gfni = TestCpuFlag(kCpuHasGFNI);
     int has_avx512bw = TestCpuFlag(kCpuHasAVX512BW);
