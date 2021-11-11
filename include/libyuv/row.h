@@ -11,8 +11,6 @@
 #ifndef INCLUDE_LIBYUV_ROW_H_
 #define INCLUDE_LIBYUV_ROW_H_
 
-#include <stdlib.h>  // For malloc.
-
 #include "libyuv/basic_types.h"
 
 #ifdef __cplusplus
@@ -672,7 +670,6 @@ extern const struct YuvConstants SIMD_ALIGNED(kYvuH709Constants);  // BT.709
 #define align_buffer_64(var, size)                                           \
   uint8_t* var##_mem = (uint8_t*)(malloc((size) + 63));         /* NOLINT */ \
   uint8_t* var = (uint8_t*)(((intptr_t)(var##_mem) + 63) & ~63) /* NOLINT */
-
 #define free_aligned_buffer_64(var) \
   free(var##_mem);                  \
   var = 0

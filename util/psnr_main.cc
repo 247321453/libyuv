@@ -22,9 +22,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #ifdef _OPENMP
 #include <omp.h>

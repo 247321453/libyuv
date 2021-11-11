@@ -8,8 +8,6 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define INCLUDE_LIBYUV_COMPARE_H_

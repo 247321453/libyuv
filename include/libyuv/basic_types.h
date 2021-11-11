@@ -11,24 +11,19 @@
 #ifndef INCLUDE_LIBYUV_BASIC_TYPES_H_
 #define INCLUDE_LIBYUV_BASIC_TYPES_H_
 
-#include <stddef.h>  // For size_t and NULL
+#include <cstdio>
+#include <malloc.h>
 
 #if !defined(INT_TYPES_DEFINED) && !defined(GG_LONGLONG)
 #define INT_TYPES_DEFINED
 
-#if defined(_MSC_VER) && (_MSC_VER < 1600)
-#include <sys/types.h>  // for uintptr_t on x86
-typedef unsigned __int64 uint64_t;
-typedef __int64 int64_t;
 typedef unsigned int uint32_t;
 typedef int int32_t;
 typedef unsigned short uint16_t;
 typedef short int16_t;
 typedef unsigned char uint8_t;
 typedef signed char int8_t;
-#else
-#include <stdint.h>  // for uintptr_t and C99 types
-#endif               // defined(_MSC_VER) && (_MSC_VER < 1600)
+
 // Types are deprecated.  Enable this macro for legacy types.
 #ifdef LIBYUV_LEGACY_TYPES
 typedef uint64_t uint64;

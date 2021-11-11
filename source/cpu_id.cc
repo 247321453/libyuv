@@ -20,8 +20,7 @@
 #endif
 
 // For ArmCpuCaps() but unittested on all platforms
-#include <stdio.h>
-#include <string.h>
+#include <cstring>
 
 #ifdef __cplusplus
 namespace libyuv {
