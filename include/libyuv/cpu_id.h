@@ -29,18 +29,6 @@ static bool Cpu_Has_NEON = false;
 static bool Cpu_Has_ERMS = false;
 //Cpu_Has_FMA3
 static bool Cpu_Has_FMA3 = false;
-
-#if defined(__x86_64__) || defined(__i386__)
-static bool Cpu_Has_X86 = true;
-static bool Cpu_Has_AVX = true;
-static bool Cpu_Has_AVX2 = true;
-static bool Cpu_Has_SSSE2 = true;
-static bool Cpu_Has_SSSE3 = true;
-static bool Cpu_Has_SSE41 = true;
-static bool Cpu_Has_SSE42 = true;
-#else
-//Cpu_Has_X86
-static bool Cpu_Has_X86 = false;
 //Cpu_Has_AVX
 static bool Cpu_Has_AVX = false;
 //Cpu_Has_AVX2
@@ -53,6 +41,12 @@ static bool Cpu_Has_SSSE3 = false;
 static bool Cpu_Has_SSE41 = false;
 //Cpu_Has_SSE42
 static bool Cpu_Has_SSE42 = false;
+
+#if defined(__x86_64__) || defined(__i386__)
+static bool Cpu_Has_X86 = true;
+#else
+//Cpu_Has_X86
+static bool Cpu_Has_X86 = false;
 #endif
 
 #ifdef __cplusplus
