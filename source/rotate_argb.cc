@@ -49,7 +49,7 @@ static void ARGBTranspose(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWNEVEN_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBRowDownEven = ScaleARGBRowDownEven_Any_MSA;
     if (IS_ALIGNED(height, 4)) {  // Width of dest.
       ScaleARGBRowDownEven = ScaleARGBRowDownEven_MSA;
@@ -57,7 +57,7 @@ static void ARGBTranspose(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWNEVEN_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ScaleARGBRowDownEven = ScaleARGBRowDownEven_Any_MMI;
     if (IS_ALIGNED(height, 4)) {  // Width of dest.
       ScaleARGBRowDownEven = ScaleARGBRowDownEven_MMI;
@@ -143,7 +143,7 @@ void ARGBRotate180(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBMIRRORROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBMirrorRow = ARGBMirrorRow_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       ARGBMirrorRow = ARGBMirrorRow_MSA;
@@ -151,7 +151,7 @@ void ARGBRotate180(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBMIRRORROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBMirrorRow = ARGBMirrorRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBMirrorRow = ARGBMirrorRow_MMI;

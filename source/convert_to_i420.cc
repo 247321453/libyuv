@@ -8,6 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
+#include <stdlib.h>
+
 #include "libyuv/convert.h"
 
 #include "libyuv/video_common.h"

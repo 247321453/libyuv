@@ -295,7 +295,7 @@ int I420ToYUY2(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOYUY2ROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToYUY2Row = I422ToYUY2Row_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       I422ToYUY2Row = I422ToYUY2Row_MSA;
@@ -303,7 +303,7 @@ int I420ToYUY2(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOYUY2ROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     I422ToYUY2Row = I422ToYUY2Row_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       I422ToYUY2Row = I422ToYUY2Row_MMI;
@@ -382,7 +382,7 @@ int I422ToUYVY(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOUYVYROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToUYVYRow = I422ToUYVYRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       I422ToUYVYRow = I422ToUYVYRow_MSA;
@@ -390,7 +390,7 @@ int I422ToUYVY(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOUYVYROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     I422ToUYVYRow = I422ToUYVYRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       I422ToUYVYRow = I422ToUYVYRow_MMI;
@@ -457,7 +457,7 @@ int I420ToUYVY(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOUYVYROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToUYVYRow = I422ToUYVYRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       I422ToUYVYRow = I422ToUYVYRow_MSA;
@@ -465,7 +465,7 @@ int I420ToUYVY(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOUYVYROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     I422ToUYVYRow = I422ToUYVYRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       I422ToUYVYRow = I422ToUYVYRow_MMI;
@@ -585,7 +585,7 @@ static int I420ToRGBAMatrix(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TORGBAROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToRGBARow = I422ToRGBARow_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       I422ToRGBARow = I422ToRGBARow_MSA;
@@ -692,7 +692,7 @@ static int I420ToRGB24Matrix(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TORGB24ROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToRGB24Row = I422ToRGB24Row_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       I422ToRGB24Row = I422ToRGB24Row_MSA;
@@ -836,7 +836,7 @@ int I420ToARGB1555(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOARGB1555ROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToARGB1555Row = I422ToARGB1555Row_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       I422ToARGB1555Row = I422ToARGB1555Row_MSA;
@@ -909,7 +909,7 @@ int I420ToARGB4444(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOARGB4444ROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToARGB4444Row = I422ToARGB4444Row_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       I422ToARGB4444Row = I422ToARGB4444Row_MSA;
@@ -982,7 +982,7 @@ int I420ToRGB565Matrix(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TORGB565ROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToRGB565Row = I422ToRGB565Row_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       I422ToRGB565Row = I422ToRGB565Row_MSA;
@@ -1104,7 +1104,7 @@ int I422ToRGB565(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TORGB565ROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToRGB565Row = I422ToRGB565Row_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       I422ToRGB565Row = I422ToRGB565Row_MSA;
@@ -1185,7 +1185,7 @@ int I420ToRGB565Dither(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TOARGBROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToARGBRow = I422ToARGBRow_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       I422ToARGBRow = I422ToARGBRow_MSA;
@@ -1217,7 +1217,7 @@ int I420ToRGB565Dither(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_ARGBTORGB565DITHERROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBToRGB565DitherRow = ARGBToRGB565DitherRow_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       ARGBToRGB565DitherRow = ARGBToRGB565DitherRow_MSA;

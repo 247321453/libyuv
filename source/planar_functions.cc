@@ -403,7 +403,7 @@ void SplitUVPlane(const uint8_t* src_uv,
   }
 #endif
 #if defined(HAS_SPLITUVROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SplitUVRow = SplitUVRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       SplitUVRow = SplitUVRow_MSA;
@@ -411,7 +411,7 @@ void SplitUVPlane(const uint8_t* src_uv,
   }
 #endif
 #if defined(HAS_SPLITUVROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SplitUVRow = SplitUVRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       SplitUVRow = SplitUVRow_MMI;
@@ -440,7 +440,6 @@ void MergeUVPlane(const uint8_t* src_u,
   int y;
   void (*MergeUVRow)(const uint8_t* src_u, const uint8_t* src_v,
                      uint8_t* dst_uv, int width) = MergeUVRow_C;
-  // Coalesce rows.
   // Negative height means invert the image.
   if (height < 0) {
     height = -height;
@@ -479,7 +478,7 @@ void MergeUVPlane(const uint8_t* src_u,
   }
 #endif
 #if defined(HAS_MERGEUVROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     MergeUVRow = MergeUVRow_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       MergeUVRow = MergeUVRow_MSA;
@@ -487,7 +486,7 @@ void MergeUVPlane(const uint8_t* src_u,
   }
 #endif
 #if defined(HAS_MERGEUVROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     MergeUVRow = MergeUVRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       MergeUVRow = MergeUVRow_MMI;
@@ -502,6 +501,63 @@ void MergeUVPlane(const uint8_t* src_u,
     src_v += src_stride_v;
     dst_uv += dst_stride_uv;
   }
+}
+
+// Convert NV21 to NV12.
+LIBYUV_API
+int NV21ToNV12(const uint8_t* src_y,
+               int src_stride_y,
+               const uint8_t* src_vu,
+               int src_stride_vu,
+               uint8_t* dst_y,
+               int dst_stride_y,
+               uint8_t* dst_uv,
+               int dst_stride_uv,
+               int width,
+               int height) {
+  int y;
+  void (*UVToVURow)(const uint8_t* src_uv, uint8_t* dst_vu, int width) =
+      UVToVURow_C;
+
+  int halfwidth = (width + 1) >> 1;
+  int halfheight = (height + 1) >> 1;
+  if (!src_vu || !dst_uv || width <= 0 || height == 0) {
+    return -1;
+  }
+  // Negative height means invert the image.
+  if (height < 0) {
+    height = -height;
+    halfheight = (height + 1) >> 1;
+    src_y = src_y + (height - 1) * src_stride_y;
+    src_vu = src_vu + (halfheight - 1) * src_stride_vu;
+    src_stride_y = -src_stride_y;
+    src_stride_vu = -src_stride_vu;
+  }
+  // Coalesce rows.
+  if (src_stride_vu == halfwidth * 2 && dst_stride_uv == halfwidth * 2) {
+    halfwidth *= halfheight;
+    halfheight = 1;
+    src_stride_vu = dst_stride_uv = 0;
+  }
+
+#if defined(HAS_UVToVUROW_NEON)
+  if (Cpu_Has_NEON) {
+    UVToVURow = UVToVURow_Any_NEON;
+    if (IS_ALIGNED(halfwidth, 16)) {
+      UVToVURow = UVToVURow_NEON;
+    }
+  }
+#endif
+  if (dst_y) {
+    CopyPlane(src_y, src_stride_y, dst_y, dst_stride_y, width, height);
+  }
+
+  for (y = 0; y < halfheight; ++y) {
+    UVToVURow(src_vu, dst_uv, halfwidth);
+    src_vu += src_stride_vu;
+    dst_uv += dst_stride_uv;
+  }
+  return 0;
 }
 
 // Support function for NV12 etc RGB channels.
@@ -554,7 +610,7 @@ void SplitRGBPlane(const uint8_t* src_rgb,
   }
 #endif
 #if defined(HAS_SPLITRGBROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SplitRGBRow = SplitRGBRow_Any_MMI;
     if (IS_ALIGNED(width, 4)) {
       SplitRGBRow = SplitRGBRow_MMI;
@@ -618,7 +674,7 @@ void MergeRGBPlane(const uint8_t* src_r,
   }
 #endif
 #if defined(HAS_MERGERGBROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     MergeRGBRow = MergeRGBRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       MergeRGBRow = MergeRGBRow_MMI;
@@ -676,7 +732,7 @@ void MirrorPlane(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_MIRRORROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     MirrorRow = MirrorRow_Any_MSA;
     if (IS_ALIGNED(width, 64)) {
       MirrorRow = MirrorRow_MSA;
@@ -684,7 +740,7 @@ void MirrorPlane(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_MIRRORROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     MirrorRow = MirrorRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       MirrorRow = MirrorRow_MMI;
@@ -765,7 +821,7 @@ int YUY2ToI422(const uint8_t* src_yuy2,
   }
 #endif
 #if defined(HAS_YUY2TOYROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     YUY2ToYRow = YUY2ToYRow_Any_MSA;
     YUY2ToUV422Row = YUY2ToUV422Row_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
@@ -775,7 +831,7 @@ int YUY2ToI422(const uint8_t* src_yuy2,
   }
 #endif
 #if defined(HAS_YUY2TOYROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     YUY2ToYRow = YUY2ToYRow_Any_MMI;
     YUY2ToUV422Row = YUY2ToUV422Row_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
@@ -861,7 +917,7 @@ int UYVYToI422(const uint8_t* src_uyvy,
   }
 #endif
 #if defined(HAS_UYVYTOYROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     UYVYToYRow = UYVYToYRow_Any_MSA;
     UYVYToUV422Row = UYVYToUV422Row_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
@@ -871,7 +927,7 @@ int UYVYToI422(const uint8_t* src_uyvy,
   }
 #endif
 #if defined(HAS_UYVYTOYROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     UYVYToYRow = UYVYToYRow_Any_MMI;
     UYVYToUV422Row = UYVYToUV422Row_Any_MMI;
     if (IS_ALIGNED(width, 16)) {
@@ -943,7 +999,7 @@ int YUY2ToY(const uint8_t* src_yuy2,
   }
 #endif
 #if defined(HAS_YUY2TOYROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     YUY2ToYRow = YUY2ToYRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       YUY2ToYRow = YUY2ToYRow_MSA;
@@ -951,7 +1007,7 @@ int YUY2ToY(const uint8_t* src_yuy2,
   }
 #endif
 #if defined(HAS_YUY2TOYROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     YUY2ToYRow = YUY2ToYRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       YUY2ToYRow = YUY2ToYRow_MMI;
@@ -1076,7 +1132,7 @@ int ARGBMirror(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBMIRRORROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBMirrorRow = ARGBMirrorRow_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       ARGBMirrorRow = ARGBMirrorRow_MSA;
@@ -1084,7 +1140,7 @@ int ARGBMirror(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBMIRRORROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBMirrorRow = ARGBMirrorRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBMirrorRow = ARGBMirrorRow_MMI;
@@ -1120,12 +1176,12 @@ ARGBBlendRow GetARGBBlend() {
   }
 #endif
 #if defined(HAS_ARGBBLENDROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBBlendRow = ARGBBlendRow_MSA;
   }
 #endif
 #if defined(HAS_ARGBBLENDROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBBlendRow = ARGBBlendRow_MMI;
   }
 #endif
@@ -1222,7 +1278,7 @@ int BlendPlane(const uint8_t* src_y0,
   }
 #endif
 #if defined(HAS_BLENDPLANEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     BlendPlaneRow = BlendPlaneRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       BlendPlaneRow = BlendPlaneRow_MMI;
@@ -1306,7 +1362,7 @@ int I420Blend(const uint8_t* src_y0,
   }
 #endif
 #if defined(HAS_BLENDPLANEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     BlendPlaneRow = BlendPlaneRow_Any_MMI;
     if (IS_ALIGNED(halfwidth, 8)) {
       BlendPlaneRow = BlendPlaneRow_MMI;
@@ -1350,7 +1406,7 @@ int I420Blend(const uint8_t* src_y0,
   }
 #endif
 #if defined(HAS_SCALEROWDOWN2_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ScaleRowDown2 = ScaleRowDown2Box_Odd_MMI;
     if (IS_ALIGNED(width, 2)) {
       ScaleRowDown2 = ScaleRowDown2Box_Any_MMI;
@@ -1438,7 +1494,7 @@ int ARGBMultiply(const uint8_t* src_argb0,
   }
 #endif
 #if defined(HAS_ARGBMULTIPLYROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBMultiplyRow = ARGBMultiplyRow_Any_MSA;
     if (IS_ALIGNED(width, 4)) {
       ARGBMultiplyRow = ARGBMultiplyRow_MSA;
@@ -1446,7 +1502,7 @@ int ARGBMultiply(const uint8_t* src_argb0,
   }
 #endif
 #if defined(HAS_ARGBMULTIPLYROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBMultiplyRow = ARGBMultiplyRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBMultiplyRow = ARGBMultiplyRow_MMI;
@@ -1523,7 +1579,7 @@ int ARGBAdd(const uint8_t* src_argb0,
   }
 #endif
 #if defined(HAS_ARGBADDROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBAddRow = ARGBAddRow_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       ARGBAddRow = ARGBAddRow_MSA;
@@ -1531,7 +1587,7 @@ int ARGBAdd(const uint8_t* src_argb0,
   }
 #endif
 #if defined(HAS_ARGBADDROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBAddRow = ARGBAddRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBAddRow = ARGBAddRow_MMI;
@@ -1603,7 +1659,7 @@ int ARGBSubtract(const uint8_t* src_argb0,
   }
 #endif
 #if defined(HAS_ARGBSUBTRACTROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBSubtractRow = ARGBSubtractRow_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       ARGBSubtractRow = ARGBSubtractRow_MSA;
@@ -1611,7 +1667,7 @@ int ARGBSubtract(const uint8_t* src_argb0,
   }
 #endif
 #if defined(HAS_ARGBSUBTRACTROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBSubtractRow = ARGBSubtractRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBSubtractRow = ARGBSubtractRow_MMI;
@@ -1679,7 +1735,7 @@ static int I422ToRGBAMatrix(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_I422TORGBAROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToRGBARow = I422ToRGBARow_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       I422ToRGBARow = I422ToRGBARow_MSA;
@@ -1781,7 +1837,7 @@ int NV12ToRGB565(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_NV12TORGB565ROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     NV12ToRGB565Row = NV12ToRGB565Row_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       NV12ToRGB565Row = NV12ToRGB565Row_MSA;
@@ -1843,7 +1899,7 @@ int RAWToRGB24(const uint8_t* src_raw,
   }
 #endif
 #if defined(HAS_RAWTORGB24ROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     RAWToRGB24Row = RAWToRGB24Row_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       RAWToRGB24Row = RAWToRGB24Row_MSA;
@@ -1851,7 +1907,7 @@ int RAWToRGB24(const uint8_t* src_raw,
   }
 #endif
 #if defined(HAS_RAWTORGB24ROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     RAWToRGB24Row = RAWToRGB24Row_Any_MMI;
     if (IS_ALIGNED(width, 4)) {
       RAWToRGB24Row = RAWToRGB24Row_MMI;
@@ -1908,7 +1964,7 @@ void SetPlane(uint8_t* dst_y,
   }
 #endif
 #if defined(HAS_SETROW_MSA)
-  if (Cpu_Has_MSA && IS_ALIGNED(width, 16)) {
+  if (TestCpuFlag(kCpuHasMSA) && IS_ALIGNED(width, 16)) {
     SetRow = SetRow_MSA;
   }
 #endif
@@ -1994,7 +2050,7 @@ int ARGBRect(uint8_t* dst_argb,
   }
 #endif
 #if defined(HAS_ARGBSETROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBSetRow = ARGBSetRow_Any_MSA;
     if (IS_ALIGNED(width, 4)) {
       ARGBSetRow = ARGBSetRow_MSA;
@@ -2072,7 +2128,7 @@ int ARGBAttenuate(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBATTENUATEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBAttenuateRow = ARGBAttenuateRow_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       ARGBAttenuateRow = ARGBAttenuateRow_MSA;
@@ -2080,7 +2136,7 @@ int ARGBAttenuate(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBATTENUATEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBAttenuateRow = ARGBAttenuateRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBAttenuateRow = ARGBAttenuateRow_MMI;
@@ -2183,12 +2239,12 @@ int ARGBGrayTo(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBGRAYROW_MSA)
-  if (Cpu_Has_MSA && IS_ALIGNED(width, 8)) {
+  if (TestCpuFlag(kCpuHasMSA) && IS_ALIGNED(width, 8)) {
     ARGBGrayRow = ARGBGrayRow_MSA;
   }
 #endif
 #if defined(HAS_ARGBGRAYROW_MMI)
-  if (Cpu_Has_MMI && IS_ALIGNED(width, 2)) {
+  if (TestCpuFlag(kCpuHasMMI) && IS_ALIGNED(width, 2)) {
     ARGBGrayRow = ARGBGrayRow_MMI;
   }
 #endif
@@ -2233,12 +2289,12 @@ int ARGBGray(uint8_t* dst_argb,
   }
 #endif
 #if defined(HAS_ARGBGRAYROW_MSA)
-  if (Cpu_Has_MSA && IS_ALIGNED(width, 8)) {
+  if (TestCpuFlag(kCpuHasMSA) && IS_ALIGNED(width, 8)) {
     ARGBGrayRow = ARGBGrayRow_MSA;
   }
 #endif
 #if defined(HAS_ARGBGRAYROW_MMI)
-  if (Cpu_Has_MMI && IS_ALIGNED(width, 2)) {
+  if (TestCpuFlag(kCpuHasMMI) && IS_ALIGNED(width, 2)) {
     ARGBGrayRow = ARGBGrayRow_MMI;
   }
 #endif
@@ -2281,12 +2337,12 @@ int ARGBSepia(uint8_t* dst_argb,
   }
 #endif
 #if defined(HAS_ARGBSEPIAROW_MSA)
-  if (Cpu_Has_MSA && IS_ALIGNED(width, 8)) {
+  if (TestCpuFlag(kCpuHasMSA) && IS_ALIGNED(width, 8)) {
     ARGBSepiaRow = ARGBSepiaRow_MSA;
   }
 #endif
 #if defined(HAS_ARGBSEPIAROW_MMI)
-  if (Cpu_Has_MMI && IS_ALIGNED(width, 2)) {
+  if (TestCpuFlag(kCpuHasMMI) && IS_ALIGNED(width, 2)) {
     ARGBSepiaRow = ARGBSepiaRow_MMI;
   }
 #endif
@@ -2337,12 +2393,12 @@ int ARGBColorMatrix(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBCOLORMATRIXROW_MSA)
-  if (Cpu_Has_MSA && IS_ALIGNED(width, 8)) {
+  if (TestCpuFlag(kCpuHasMSA) && IS_ALIGNED(width, 8)) {
     ARGBColorMatrixRow = ARGBColorMatrixRow_MSA;
   }
 #endif
 #if defined(HAS_ARGBCOLORMATRIXROW_MMI)
-  if (Cpu_Has_MMI && IS_ALIGNED(width, 2)) {
+  if (TestCpuFlag(kCpuHasMMI) && IS_ALIGNED(width, 2)) {
     ARGBColorMatrixRow = ARGBColorMatrixRow_MMI;
   }
 #endif
@@ -2507,7 +2563,7 @@ int ARGBQuantize(uint8_t* dst_argb,
   }
 #endif
 #if defined(HAS_ARGBQUANTIZEROW_MSA)
-  if (Cpu_Has_MSA && IS_ALIGNED(width, 8)) {
+  if (TestCpuFlag(kCpuHasMSA) && IS_ALIGNED(width, 8)) {
     ARGBQuantizeRow = ARGBQuantizeRow_MSA;
   }
 #endif
@@ -2541,7 +2597,7 @@ int ARGBComputeCumulativeSum(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_CUMULATIVESUMTOAVERAGEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ComputeCumulativeSumRow = ComputeCumulativeSumRow_MMI;
   }
 #endif
@@ -2605,7 +2661,7 @@ int ARGBBlur(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_CUMULATIVESUMTOAVERAGEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ComputeCumulativeSumRow = ComputeCumulativeSumRow_MMI;
   }
 #endif
@@ -2711,12 +2767,12 @@ int ARGBShade(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBSHADEROW_MSA)
-  if (Cpu_Has_MSA && IS_ALIGNED(width, 4)) {
+  if (TestCpuFlag(kCpuHasMSA) && IS_ALIGNED(width, 4)) {
     ARGBShadeRow = ARGBShadeRow_MSA;
   }
 #endif
 #if defined(HAS_ARGBSHADEROW_MMI)
-  if (Cpu_Has_MMI && IS_ALIGNED(width, 2)) {
+  if (TestCpuFlag(kCpuHasMMI) && IS_ALIGNED(width, 2)) {
     ARGBShadeRow = ARGBShadeRow_MMI;
   }
 #endif
@@ -2784,7 +2840,7 @@ int InterpolatePlane(const uint8_t* src0,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     InterpolateRow = InterpolateRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       InterpolateRow = InterpolateRow_MSA;
@@ -2792,7 +2848,7 @@ int InterpolatePlane(const uint8_t* src0,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     InterpolateRow = InterpolateRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       InterpolateRow = InterpolateRow_MMI;
@@ -2915,7 +2971,7 @@ int ARGBShuffle(const uint8_t* src_bgra,
   }
 #endif
 #if defined(HAS_ARGBSHUFFLEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBShuffleRow = ARGBShuffleRow_Any_MSA;
     if (IS_ALIGNED(width, 8)) {
       ARGBShuffleRow = ARGBShuffleRow_MSA;
@@ -2923,7 +2979,7 @@ int ARGBShuffle(const uint8_t* src_bgra,
   }
 #endif
 #if defined(HAS_ARGBSHUFFLEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBShuffleRow = ARGBShuffleRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBShuffleRow = ARGBShuffleRow_MMI;
@@ -2994,7 +3050,7 @@ static int ARGBSobelize(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBTOYJROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBToYJRow = ARGBToYJRow_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       ARGBToYJRow = ARGBToYJRow_MSA;
@@ -3002,7 +3058,7 @@ static int ARGBSobelize(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBTOYJROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBToYJRow = ARGBToYJRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       ARGBToYJRow = ARGBToYJRow_MMI;
@@ -3021,12 +3077,12 @@ static int ARGBSobelize(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SOBELYROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SobelYRow = SobelYRow_MSA;
   }
 #endif
 #if defined(HAS_SOBELYROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SobelYRow = SobelYRow_MMI;
   }
 #endif
@@ -3041,12 +3097,12 @@ static int ARGBSobelize(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SOBELXROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SobelXRow = SobelXRow_MSA;
   }
 #endif
 #if defined(HAS_SOBELXROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SobelXRow = SobelXRow_MMI;
   }
 #endif
@@ -3125,7 +3181,7 @@ int ARGBSobel(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SOBELROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SobelRow = SobelRow_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       SobelRow = SobelRow_MSA;
@@ -3133,7 +3189,7 @@ int ARGBSobel(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SOBELROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SobelRow = SobelRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       SobelRow = SobelRow_MMI;
@@ -3171,7 +3227,7 @@ int ARGBSobelToPlane(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SOBELTOPLANEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SobelToPlaneRow = SobelToPlaneRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       SobelToPlaneRow = SobelToPlaneRow_MSA;
@@ -3179,7 +3235,7 @@ int ARGBSobelToPlane(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SOBELTOPLANEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SobelToPlaneRow = SobelToPlaneRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       SobelToPlaneRow = SobelToPlaneRow_MMI;
@@ -3218,7 +3274,7 @@ int ARGBSobelXY(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SOBELXYROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SobelXYRow = SobelXYRow_Any_MSA;
     if (IS_ALIGNED(width, 16)) {
       SobelXYRow = SobelXYRow_MSA;
@@ -3226,7 +3282,7 @@ int ARGBSobelXY(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_SOBELXYROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SobelXYRow = SobelXYRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       SobelXYRow = SobelXYRow_MMI;
@@ -3349,7 +3405,7 @@ int HalfFloatPlane(const uint16_t* src_y,
   }
 #endif
 #if defined(HAS_HALFFLOATROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     HalfFloatRow = HalfFloatRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       HalfFloatRow = HalfFloatRow_MSA;
@@ -3471,7 +3527,7 @@ int ARGBCopyAlpha(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBCOPYALPHAROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBCopyAlphaRow = ARGBCopyAlphaRow_Any_MMI;
     if (IS_ALIGNED(width, 2)) {
       ARGBCopyAlphaRow = ARGBCopyAlphaRow_MMI;
@@ -3531,13 +3587,13 @@ int ARGBExtractAlpha(const uint8_t* src_argb,
   }
 #endif
 #if defined(HAS_ARGBEXTRACTALPHAROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ARGBExtractAlphaRow = IS_ALIGNED(width, 16) ? ARGBExtractAlphaRow_MSA
                                                 : ARGBExtractAlphaRow_Any_MSA;
   }
 #endif
 #if defined(HAS_ARGBEXTRACTALPHAROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBExtractAlphaRow = IS_ALIGNED(width, 8) ? ARGBExtractAlphaRow_MMI
                                                : ARGBExtractAlphaRow_Any_MMI;
   }
@@ -3594,7 +3650,7 @@ int ARGBCopyYToAlpha(const uint8_t* src_y,
   }
 #endif
 #if defined(HAS_ARGBCOPYYTOALPHAROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ARGBCopyYToAlphaRow = ARGBCopyYToAlphaRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       ARGBCopyYToAlphaRow = ARGBCopyYToAlphaRow_MMI;
@@ -3663,7 +3719,7 @@ int YUY2ToNV12(const uint8_t* src_yuy2,
   }
 #endif
 #if defined(HAS_SPLITUVROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SplitUVRow = SplitUVRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       SplitUVRow = SplitUVRow_MSA;
@@ -3671,7 +3727,7 @@ int YUY2ToNV12(const uint8_t* src_yuy2,
   }
 #endif
 #if defined(HAS_SPLITUVROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SplitUVRow = SplitUVRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       SplitUVRow = SplitUVRow_MMI;
@@ -3703,7 +3759,7 @@ int YUY2ToNV12(const uint8_t* src_yuy2,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     InterpolateRow = InterpolateRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       InterpolateRow = InterpolateRow_MSA;
@@ -3711,7 +3767,7 @@ int YUY2ToNV12(const uint8_t* src_yuy2,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     InterpolateRow = InterpolateRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       InterpolateRow = InterpolateRow_MMI;
@@ -3795,7 +3851,7 @@ int UYVYToNV12(const uint8_t* src_uyvy,
   }
 #endif
 #if defined(HAS_SPLITUVROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SplitUVRow = SplitUVRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       SplitUVRow = SplitUVRow_MSA;
@@ -3803,7 +3859,7 @@ int UYVYToNV12(const uint8_t* src_uyvy,
   }
 #endif
 #if defined(HAS_SPLITUVROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SplitUVRow = SplitUVRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       SplitUVRow = SplitUVRow_MMI;
@@ -3835,7 +3891,7 @@ int UYVYToNV12(const uint8_t* src_uyvy,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     InterpolateRow = InterpolateRow_Any_MSA;
     if (IS_ALIGNED(width, 32)) {
       InterpolateRow = InterpolateRow_MSA;
@@ -3843,7 +3899,7 @@ int UYVYToNV12(const uint8_t* src_uyvy,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     InterpolateRow = InterpolateRow_Any_MMI;
     if (IS_ALIGNED(width, 8)) {
       InterpolateRow = InterpolateRow_MMI;

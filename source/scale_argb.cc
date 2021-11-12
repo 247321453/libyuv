@@ -96,7 +96,7 @@ static void ScaleARGBDown2(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWN2_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBRowDown2 =
         filtering == kFilterNone
             ? ScaleARGBRowDown2_Any_MSA
@@ -112,7 +112,7 @@ static void ScaleARGBDown2(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWN2_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ScaleARGBRowDown2 =
         filtering == kFilterNone
             ? ScaleARGBRowDown2_Any_MMI
@@ -244,7 +244,7 @@ static void ScaleARGBDownEven(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWNEVEN_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBRowDownEven = filtering ? ScaleARGBRowDownEvenBox_Any_MSA
                                      : ScaleARGBRowDownEven_Any_MSA;
     if (IS_ALIGNED(dst_width, 4)) {
@@ -254,7 +254,7 @@ static void ScaleARGBDownEven(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBROWDOWNEVEN_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ScaleARGBRowDownEven = filtering ? ScaleARGBRowDownEvenBox_Any_MMI
                                      : ScaleARGBRowDownEven_Any_MMI;
     if (IS_ALIGNED(dst_width, 2)) {
@@ -333,7 +333,7 @@ static void ScaleARGBBilinearDown(int src_width,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     InterpolateRow = InterpolateRow_Any_MSA;
     if (IS_ALIGNED(clip_src_width, 32)) {
       InterpolateRow = InterpolateRow_MSA;
@@ -354,7 +354,7 @@ static void ScaleARGBBilinearDown(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBFILTERCOLS_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBFilterCols = ScaleARGBFilterCols_Any_MSA;
     if (IS_ALIGNED(dst_width, 8)) {
       ScaleARGBFilterCols = ScaleARGBFilterCols_MSA;
@@ -437,7 +437,7 @@ static void ScaleARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     InterpolateRow = InterpolateRow_Any_MSA;
     if (IS_ALIGNED(dst_width, 8)) {
       InterpolateRow = InterpolateRow_MSA;
@@ -445,7 +445,7 @@ static void ScaleARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     InterpolateRow = InterpolateRow_Any_MMI;
     if (IS_ALIGNED(dst_width, 2)) {
       InterpolateRow = InterpolateRow_MMI;
@@ -470,7 +470,7 @@ static void ScaleARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBFILTERCOLS_MSA)
-  if (filtering && Cpu_Has_MSA) {
+  if (filtering && TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBFilterCols = ScaleARGBFilterCols_Any_MSA;
     if (IS_ALIGNED(dst_width, 8)) {
       ScaleARGBFilterCols = ScaleARGBFilterCols_MSA;
@@ -491,7 +491,7 @@ static void ScaleARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBCOLS_MSA)
-  if (!filtering && Cpu_Has_MSA) {
+  if (!filtering && TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBFilterCols = ScaleARGBCols_Any_MSA;
     if (IS_ALIGNED(dst_width, 4)) {
       ScaleARGBFilterCols = ScaleARGBCols_MSA;
@@ -499,7 +499,7 @@ static void ScaleARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBCOLS_MMI)
-  if (!filtering && Cpu_Has_MMI) {
+  if (!filtering && TestCpuFlag(kCpuHasMMI)) {
     ScaleARGBFilterCols = ScaleARGBCols_Any_MMI;
     if (IS_ALIGNED(dst_width, 1)) {
       ScaleARGBFilterCols = ScaleARGBCols_MMI;
@@ -514,7 +514,7 @@ static void ScaleARGBBilinearUp(int src_width,
     }
 #endif
 #if defined(HAS_SCALEARGBCOLSUP2_MMI)
-    if (Cpu_Has_MMI && IS_ALIGNED(dst_width, 4)) {
+    if (TestCpuFlag(kCpuHasMMI) && IS_ALIGNED(dst_width, 4)) {
       ScaleARGBFilterCols = ScaleARGBColsUp2_MMI;
     }
 #endif
@@ -620,7 +620,7 @@ static void ScaleYUVToARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_I422TOARGBROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     I422ToARGBRow = I422ToARGBRow_Any_MSA;
     if (IS_ALIGNED(src_width, 8)) {
       I422ToARGBRow = I422ToARGBRow_MSA;
@@ -656,7 +656,7 @@ static void ScaleYUVToARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     InterpolateRow = InterpolateRow_Any_MSA;
     if (IS_ALIGNED(dst_width, 8)) {
       InterpolateRow = InterpolateRow_MSA;
@@ -685,7 +685,7 @@ static void ScaleYUVToARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBFILTERCOLS_MSA)
-  if (filtering && Cpu_Has_MSA) {
+  if (filtering && TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBFilterCols = ScaleARGBFilterCols_Any_MSA;
     if (IS_ALIGNED(dst_width, 8)) {
       ScaleARGBFilterCols = ScaleARGBFilterCols_MSA;
@@ -706,7 +706,7 @@ static void ScaleYUVToARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBCOLS_MSA)
-  if (!filtering && Cpu_Has_MSA) {
+  if (!filtering && TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBFilterCols = ScaleARGBCols_Any_MSA;
     if (IS_ALIGNED(dst_width, 4)) {
       ScaleARGBFilterCols = ScaleARGBCols_MSA;
@@ -714,7 +714,7 @@ static void ScaleYUVToARGBBilinearUp(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBCOLS_MMI)
-  if (!filtering && Cpu_Has_MMI) {
+  if (!filtering && TestCpuFlag(kCpuHasMMI)) {
     ScaleARGBFilterCols = ScaleARGBCols_Any_MMI;
     if (IS_ALIGNED(dst_width, 1)) {
       ScaleARGBFilterCols = ScaleARGBCols_MMI;
@@ -729,7 +729,7 @@ static void ScaleYUVToARGBBilinearUp(int src_width,
     }
 #endif
 #if defined(HAS_SCALEARGBCOLSUP2_MMI)
-    if (Cpu_Has_MMI && IS_ALIGNED(dst_width, 4)) {
+    if (TestCpuFlag(kCpuHasMMI) && IS_ALIGNED(dst_width, 4)) {
       ScaleARGBFilterCols = ScaleARGBColsUp2_MMI;
     }
 #endif
@@ -850,7 +850,7 @@ static void ScaleARGBSimple(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBCOLS_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     ScaleARGBCols = ScaleARGBCols_Any_MSA;
     if (IS_ALIGNED(dst_width, 4)) {
       ScaleARGBCols = ScaleARGBCols_MSA;
@@ -858,7 +858,7 @@ static void ScaleARGBSimple(int src_width,
   }
 #endif
 #if defined(HAS_SCALEARGBCOLS_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     ScaleARGBCols = ScaleARGBCols_Any_MMI;
     if (IS_ALIGNED(dst_width, 1)) {
       ScaleARGBCols = ScaleARGBCols_MMI;
@@ -873,7 +873,7 @@ static void ScaleARGBSimple(int src_width,
     }
 #endif
 #if defined(HAS_SCALEARGBCOLSUP2_MMI)
-    if (Cpu_Has_MMI && IS_ALIGNED(dst_width, 4)) {
+    if (TestCpuFlag(kCpuHasMMI) && IS_ALIGNED(dst_width, 4)) {
       ScaleARGBCols = ScaleARGBColsUp2_MMI;
     }
 #endif

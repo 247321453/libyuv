@@ -35,7 +35,7 @@ uint32_t HashDjb2(const uint8_t* src, uint64_t count, uint32_t seed) {
   uint32_t (*HashDjb2_SSE)(const uint8_t* src, int count, uint32_t seed) =
       HashDjb2_C;
 #if defined(HAS_HASHDJB2_SSE41)
-  if (TestCpuFlag(kCpuHasSSE41)) {
+  if (Cpu_Has_SSE41) {
     HashDjb2_SSE = HashDjb2_SSE41;
   }
 #endif
@@ -150,12 +150,12 @@ uint64_t ComputeHammingDistance(const uint8_t* src_a,
   }
 #endif
 #if defined(HAS_HAMMINGDISTANCE_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     HammingDistance = HammingDistance_MSA;
   }
 #endif
 #if defined(HAS_HAMMINGDISTANCE_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     HammingDistance = HammingDistance_MMI;
   }
 #endif
@@ -212,12 +212,12 @@ uint64_t ComputeSumSquareError(const uint8_t* src_a,
   }
 #endif
 #if defined(HAS_SUMSQUAREERROR_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     SumSquareError = SumSquareError_MSA;
   }
 #endif
 #if defined(HAS_SUMSQUAREERROR_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     SumSquareError = SumSquareError_MMI;
   }
 #endif

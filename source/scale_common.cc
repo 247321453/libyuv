@@ -1068,7 +1068,7 @@ void ScalePlaneVertical(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MSA)
-  if (Cpu_Has_MSA) {
+  if (TestCpuFlag(kCpuHasMSA)) {
     InterpolateRow = InterpolateRow_Any_MSA;
     if (IS_ALIGNED(dst_width_bytes, 32)) {
       InterpolateRow = InterpolateRow_MSA;
@@ -1076,7 +1076,7 @@ void ScalePlaneVertical(int src_height,
   }
 #endif
 #if defined(HAS_INTERPOLATEROW_MMI)
-  if (Cpu_Has_MMI) {
+  if (TestCpuFlag(kCpuHasMMI)) {
     InterpolateRow = InterpolateRow_Any_MMI;
     if (IS_ALIGNED(dst_width_bytes, 8)) {
       InterpolateRow = InterpolateRow_MMI;

@@ -11,6 +11,8 @@
 #ifndef INCLUDE_LIBYUV_ROW_H_
 #define INCLUDE_LIBYUV_ROW_H_
 
+#include <stdlib.h>  // For malloc.
+
 #include "libyuv/basic_types.h"
 
 #ifdef __cplusplus
@@ -330,6 +332,7 @@ extern "C" {
 #define HAS_ARGBTOUVROW_NEON
 #define HAS_ARGBTOYJROW_NEON
 #define HAS_ARGBTOYROW_NEON
+#define HAS_AYUVTOUVROW_NEON
 #define HAS_AYUVTOVUROW_NEON
 #define HAS_AYUVTOYROW_NEON
 #define HAS_BGRATOUVROW_NEON
@@ -373,6 +376,7 @@ extern "C" {
 #define HAS_SETROW_NEON
 #define HAS_SPLITRGBROW_NEON
 #define HAS_SPLITUVROW_NEON
+#define HAS_UVToVUROW_NEON
 #define HAS_UYVYTOARGBROW_NEON
 #define HAS_UYVYTOUV422ROW_NEON
 #define HAS_UYVYTOUVROW_NEON
@@ -670,6 +674,7 @@ extern const struct YuvConstants SIMD_ALIGNED(kYvuH709Constants);  // BT.709
 #define align_buffer_64(var, size)                                           \
   uint8_t* var##_mem = (uint8_t*)(malloc((size) + 63));         /* NOLINT */ \
   uint8_t* var = (uint8_t*)(((intptr_t)(var##_mem) + 63) & ~63) /* NOLINT */
+
 #define free_aligned_buffer_64(var) \
   free(var##_mem);                  \
   var = 0
@@ -3367,17 +3372,34 @@ void UYVYToUV422Row_Any_MMI(const uint8_t* src_ptr,
                             uint8_t* dst_u,
                             uint8_t* dst_v,
                             int width);
-
+void UVToVURow_C(const uint8_t* src_uv, uint8_t* dst_vu, int width);
+void UVToVURow_NEON(const uint8_t* src_uv, uint8_t* dst_vu, int width);
+void UVToVURow_Any_NEON(const uint8_t* src_uv, uint8_t* dst_vu, int width);
 void AYUVToYRow_C(const uint8_t* src_ayuv, uint8_t* dst_y, int width);
-void AYUVToVURow_C(const uint8_t* src_ayuv, int stride_ayuv,
+void AYUVToUVRow_C(const uint8_t* src_ayuv,
+                   int stride_ayuv,
+                   uint8_t* dst_uv,
+                   int width);
+void AYUVToVURow_C(const uint8_t* src_ayuv,
+                   int stride_ayuv,
                    uint8_t* dst_vu,
                    int width);
 void AYUVToYRow_NEON(const uint8_t* src_ayuv, uint8_t* dst_y, int width);
-void AYUVToVURow_NEON(const uint8_t* src_ayuv, int stride_ayuv,
+void AYUVToUVRow_NEON(const uint8_t* src_ayuv,
+                      int stride_ayuv,
+                      uint8_t* dst_uv,
+                      int width);
+void AYUVToVURow_NEON(const uint8_t* src_ayuv,
+                      int stride_ayuv,
                       uint8_t* dst_vu,
                       int width);
 void AYUVToYRow_Any_NEON(const uint8_t* src_ayuv, uint8_t* dst_y, int width);
-void AYUVToVURow_Any_NEON(const uint8_t* src_ayuv, int stride_ayuv,
+void AYUVToUVRow_Any_NEON(const uint8_t* src_ayuv,
+                          int stride_ayuv,
+                          uint8_t* dst_uv,
+                          int width);
+void AYUVToVURow_Any_NEON(const uint8_t* src_ayuv,
+                          int stride_ayuv,
                           uint8_t* dst_vu,
                           int width);
 
@@ -4006,7 +4028,6 @@ void FloatDivToByteRow_NEON(const float* src_weights,
                             uint8_t* dst_out,
                             uint8_t* dst_mask,
                             int width);
-
 
 #ifdef __cplusplus
 }  // extern "C"

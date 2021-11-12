@@ -13,6 +13,7 @@
 
 #if !defined(LIBYUV_DISABLE_MSA) && defined(__mips_msa)
 #include <msa.h>
+#include <stdint.h>
 
 #if (__mips_isa_rev >= 6)
 #define LW(psrc)                                       \
